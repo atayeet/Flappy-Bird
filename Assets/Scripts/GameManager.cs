@@ -1,43 +1,46 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using System;
+using UnityEngine.SceneManagement;
+using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
     public int score;
-
     public int bestScore;
 
     public Text ScoreText;
-
     public Text BestScoreText;
+
+    private DatabaseManager dbManager;
 
     private void Start()
     {
+        dbManager = FindObjectOfType<DatabaseManager>();
+
         score = 0;
         ScoreText.text = score.ToString();
 
-        bestScore = PlayerPrefs.GetInt("BestScore", 0);
+        bestScore = dbManager.GetBestScore();
         BestScoreText.text = bestScore.ToString();
-
     }
+
     public void UpdateScore()
     {
         score++;
         ScoreText.text = score.ToString();
 
-        bestScore = PlayerPrefs.GetInt("BestScore", 0);
         if (score > bestScore)
         {
-            PlayerPrefs.SetInt("BestScore", score);
-            BestScoreText.text = score.ToString();
+            bestScore = score;
+            BestScoreText.text = bestScore.ToString();
         }
     }
+
     public void RestartGame()
     {
+        dbManager.InsertScore(score, bestScore);
         SceneManager.LoadScene("PlayScene");
     }
 }
